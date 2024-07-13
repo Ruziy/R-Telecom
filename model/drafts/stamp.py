@@ -1,10 +1,5 @@
 import cv2
 
-def get_area(contour):
-    x, y, w, h = cv2.boundingRect(contour)
-    area = w * h
-    return area
-
 def detect_and_draw_stamps(image_path):
     image = cv2.imread(image_path)
     if image is None:
@@ -18,9 +13,8 @@ def detect_and_draw_stamps(image_path):
     contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     # Сортируем контуры по площади (от большего к меньшему)
-    contours = sorted(contours, key=get_area, reverse=True)
+    contours = sorted(contours, key=cv2.contourArea, reverse=True)
     bounding_boxes = []
-    areas = []
 
     for contour in contours:
         x, y, w, h = cv2.boundingRect(contour)
@@ -34,22 +28,14 @@ def detect_and_draw_stamps(image_path):
                     break
             if not overlap:
                 bounding_boxes.append(bounding_box)
-                areas.append(w * h)
+                cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)  # Отрисовка зеленой рамки
+                
+                # Вывод площади над рамкой
+                area = w * h
+                area_text = f"{area:.2f}"
 
-    if len(areas)>2:
-        print(areas)
-        average_area = sum(areas) / (len(areas)*2)
-        print("avg",average_area)
-    else:
-        average_area = 0
-
-    for (x, y, w, h) in bounding_boxes:
-        area = w * h
-        if area > average_area:
-            cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)  # Отрисовка зеленой рамки
-            area_text = f"{area:.2f}"
-            print(area_text)
-            cv2.putText(image, area_text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                print(area_text)
+                cv2.putText(image, area_text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
     # Отображение изображения с отрисованными рамками
     image = cv2.resize(image, (600, 800))
@@ -58,6 +44,5 @@ def detect_and_draw_stamps(image_path):
     cv2.destroyAllWindows()
 
 # Пример использования
-image_path = 'images/img_7.png'
+image_path = 'images/img_5.jpg'
 detect_and_draw_stamps(image_path)
-
