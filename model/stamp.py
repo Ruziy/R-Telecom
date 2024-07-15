@@ -5,8 +5,11 @@ def get_area(contour):
     area = w * h
     return area
 
-def detect_and_draw_stamps(image_path):
-    image = cv2.imread(image_path)
+def detect_and_draw_stamps(img,image_path=None,counter=True):
+    if image_path==None:
+        image = img
+    else:
+        image = cv2.imread(image_path)
     if image is None:
         raise FileNotFoundError(f"Не удалось загрузить изображение по пути: {image_path}")
 
@@ -35,7 +38,11 @@ def detect_and_draw_stamps(image_path):
             if not overlap:
                 bounding_boxes.append(bounding_box)
                 areas.append(w * h)
-
+                if len(areas) and counter:
+                    return 1
+    if len(areas)==0 and counter:
+        return 0
+    
     if len(areas)>2:
         print(areas)
         average_area = sum(areas) / (len(areas)*2)
@@ -58,6 +65,7 @@ def detect_and_draw_stamps(image_path):
     cv2.destroyAllWindows()
 
 # Пример использования
-image_path = 'images/img_7.png'
-detect_and_draw_stamps(image_path)
+# image_path = 'images/img.png'
+# res = detect_and_draw_stamps(image_path)
+# print(res)
 
