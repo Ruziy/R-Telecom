@@ -11,7 +11,7 @@ end_point = None
 drawing = False
 
 # Путь к изображению
-image_path = r"model\images\img_4.png"
+image_path = r"images\img_pdf_1.jpg"
 
 # Загрузка изображения
 image = cv2.imread(image_path)
